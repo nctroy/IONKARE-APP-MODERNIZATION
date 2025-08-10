@@ -1,0 +1,34 @@
+name: IaC Validate (interview)
+
+on:
+  push:
+    branches: [ interview ]
+    paths:
+      - 'infrastructure/**'
+  pull_request:
+    branches: [ interview ]
+    paths:
+      - 'infrastructure/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        tfdir:
+          - infrastructure/aws/envs/interview
+          - infrastructure/azure/envs/interview
+          - infrastructure/gcp/envs/interview
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+      - name: Terraform fmt (repo)
+        run: terraform fmt -check -recursive || true
+      - name: Terraform init
+        run: terraform -chdir=${{ matrix.tfdir }} init -backend=false
+      - name: Terraform validate
+        run: terraform -chdir=${{ matrix.tfdir }} validate
+
