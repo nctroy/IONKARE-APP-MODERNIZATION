@@ -56,6 +56,44 @@ This document defines the security strategy, controls, and operational practices
 - Secrets: no secrets in code; use Secrets Manager; automated rotation for DB and API keys
 - CI CD: least privilege IAM for pipelines, environment separation, manual approvals for prod
 
+### SDLC Security Data Flow Diagram (DFD)
+
+```mermaid
+flowchart LR
+  dev["Developer"] --> pr["Commit & Pull Request (GitHub)"]
+  pr --> ci["CI (GitHub Actions)"]
+
+  ci -- run --> codeql["CodeQL (SAST)"]
+  ci -- run --> semgrep["Semgrep (SAST)"]
+  ci -- run --> gitleaks["Gitleaks (Secrets)"]
+  ci -- run --> dep["Dependency Review (GH native)"]
+
+  ci -- build --> build["Build artifacts / container image"]
+  ci -- scan --> checkov["Checkov (IaC)"]
+  ci -- enforce --> conftest["OPA Conftest (policy/opa)"]
+
+  build -- scan --> trivy["Trivy (image/fs)"]
+  build -- generate --> sbom["Syft SBOM"]
+  sbom -- upload --> artifact["CI artifact / release attachment"]
+
+  trivy -- pass --> gate1["Security gate"]
+  checkov -- report --> gate2["Policy gate"]
+  conftest -- pass --> gate2
+
+  gate1 -- allow --> registry["Container Registry (ECR)"]
+  gate2 -- allow --> deploy["Deploy (Terraform/AWS)"]
+  registry --> deploy
+
+  deploy -- telemetry --> cloudsec["Security Hub / Config / CloudTrail"]
+  cloudsec -- alerts --> siem["SIEM/SOAR"]
+```
+
+Rationale:
+- Code quality and secret hygiene gates early (CodeQL, Semgrep, Gitleaks).
+- Supply‑chain controls through dependency review, SBOM, and image/file scans (Trivy).
+- IaC posture and policy gates before deploy (Checkov, OPA Conftest using `policy/opa`).
+- Cloud native telemetry closes the loop to SIEM/SOAR for continuous monitoring.
+
 ## Logging, Monitoring, and Telemetry
 - Structured JSON logs with correlation IDs; centralized log aggregation
 - Metrics and tracing via OpenTelemetry; application and infrastructure dashboards
