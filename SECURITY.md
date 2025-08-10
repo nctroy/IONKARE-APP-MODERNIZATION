@@ -68,17 +68,18 @@ This document defines the security strategy, controls, and operational practices
 
 ```mermaid
 flowchart TD
-  User[End User (Patient/Visitor)] -->|HTTPS| Web[Next.js Web]
-  Web -->|HTTPS| API[NestJS API]
-  API -->|TLS| DB[(Postgres)]
-  API -->|TLS| Cache[(Redis)]
-  API -->|S3 SDK| S3[(S3 Bucket)]
-  API -->|SMTP/SES| Email[Email Service]
-  API -->|OIDC| IdP[Identity Provider]
-  WAF[WAF/CloudFront] --> Web
-  SIEM[SIEM/SOAR] <-->|Logs/Alerts| API
-  CloudTrail[CloudTrail/Config] --> SIEM
-  GuardDuty[GuardDuty] --> SIEM
+  user["End User (Patient/Visitor)"] -- HTTPS --> web["Next.js Web"]
+  web -- HTTPS --> api["NestJS API"]
+  api -- TLS --> db["Postgres"]
+  api -- TLS --> cache["Redis"]
+  api -- S3 SDK --> s3["S3 Bucket"]
+  api -- SMTP/SES --> email["Email Service"]
+  api -- OIDC --> idp["Identity Provider"]
+  waf["WAF/CloudFront"] --> web
+  api -- Logs/Alerts --> siem["SIEM/SOAR"]
+  siem -- Tickets/Actions --> api
+  ct["CloudTrail/Config"] --> siem
+  gd["GuardDuty"] --> siem
 ```
 - Spoofing: enforce strong auth, mTLS or verified JWT between services, key rotation
 - Tampering: integrity checks, signed artifacts, content hashes, WORM logs
