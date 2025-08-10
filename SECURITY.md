@@ -63,6 +63,23 @@ This document defines the security strategy, controls, and operational practices
 - Log retention and immutability: S3 with object lock for audit trails
 
 ## Threat Modeling (STRIDE overview)
+
+### Data Flow Diagram
+
+```mermaid
+flowchart TD
+  User[End User (Patient/Visitor)] -->|HTTPS| Web[Next.js Web]
+  Web -->|HTTPS| API[NestJS API]
+  API -->|TLS| DB[(Postgres)]
+  API -->|TLS| Cache[(Redis)]
+  API -->|S3 SDK| S3[(S3 Bucket)]
+  API -->|SMTP/SES| Email[Email Service]
+  API -->|OIDC| IdP[Identity Provider]
+  WAF[WAF/CloudFront] --> Web
+  SIEM[SIEM/SOAR] <-->|Logs/Alerts| API
+  CloudTrail[CloudTrail/Config] --> SIEM
+  GuardDuty[GuardDuty] --> SIEM
+```
 - Spoofing: enforce strong auth, mTLS or verified JWT between services, key rotation
 - Tampering: integrity checks, signed artifacts, content hashes, WORM logs
 - Repudiation: comprehensive audit logs with user and request context, clock sync
@@ -116,3 +133,37 @@ This document defines the security strategy, controls, and operational practices
 - Security headers checklist: HSTS, CSP, XFO deny, XCTO nosniff, RP strict origin when cross origin
 - Default rate limits by endpoint class
 - Reference architectures and runbooks locations
+
+
+## Additional Controls and Governance (Additions)
+
+### Data Retention and Legal Hold
+- Data retention matrices per record type with durations and lawful basis
+- Legal hold workflow to suspend deletions and lifecycle rules for specific matters
+- Automated enforcement via lifecycle policies, DB TTL jobs, and policy checks
+
+### Security Decision RACI and Exception Management
+- Formal RACI for security decisions such as policies, exceptions, go live approvals
+- Documented exception process with risk acceptance, owner, expiry, and compensating controls
+
+### Endpoint Detection and Response (EDR)
+- Server or container EDR baseline for hosts and containers
+- Telemetry integrated to SIEM with tuned alerts and response playbooks
+
+### Key Management Ceremony and Runbooks
+- KMS CMK ownership, rotation policy, and separation of duties
+- Formal key ceremony for creation, rotation, and destruction with dual control approvals
+- Runbooks for break glass access and incident key compromise
+
+### Penetration Testing and Red Teaming
+- Annual external penetration test covering web, API, and cloud configuration
+- Threat led red teaming and tabletop exercises for priority scenarios
+- Vendor selection criteria and NDAs with safe scopes and test data
+
+### Third Party Risk Management
+- Intake and risk tiering, security questionnaires, evidence based reviews
+- Continuous monitoring plus contract clauses and defined offboarding steps
+
+### Security Tooling SLAs and SLOs
+- Defined SLOs for alert delivery, signal to noise, and MTTA or MTTR targets
+- Health checks, runbooks, and quarterly effectiveness reviews
