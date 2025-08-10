@@ -1,0 +1,12 @@
+# SOAR Playbook: Auth Abuse Auto-Containment
+trigger: sigma:auth-login-burst
+severity: high
+actions:
+  - type: waf.rate_limit_increase
+    params: { scope: login-endpoints, duration: 2h }
+  - type: iam.require_mfa
+    params: { group: privileged_users }
+  - type: block.ip
+    params: { ip: "{{src_ip}}", duration: 24h }
+  - type: notify
+    params: { channel: security-ops, template: auth-abuse }

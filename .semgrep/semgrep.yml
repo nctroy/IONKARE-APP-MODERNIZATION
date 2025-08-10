@@ -1,0 +1,11 @@
+rules:
+  - id: no-disabled-tls-verify
+    languages: [javascript, typescript]
+    pattern: "rejectUnauthorized: false"
+    message: "Do not disable TLS verification"
+    severity: ERROR
+  - id: no-hardcoded-secrets
+    languages: [generic]
+    pattern: /(?i)(api[_-]?key|secret|password)\s*[:=]\s*[\"\'][^\"\']+[\"\']/
+    message: "Possible hardcoded secret"
+    severity: WARNING

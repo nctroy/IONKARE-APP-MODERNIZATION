@@ -1,0 +1,14 @@
+# SOAR Playbook: Data Exfiltration Lockdown
+trigger: sigma:data-exfiltration
+severity: critical
+actions:
+  - type: revoke.credentials
+    params: { principal: "{{actor}}" }
+  - type: s3.block_public_access
+    params: { bucket: "{{bucket}}" }
+  - type: iam.detach_policies
+    params: { principal: "{{actor}}", policies: ["*admin*"] }
+  - type: quarantine
+    params: { workload: "{{workload}}" }
+  - type: notify
+    params: { channel: incident-bridge, template: data-exfil }

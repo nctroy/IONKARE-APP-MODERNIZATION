@@ -1,0 +1,14 @@
+title: IAM Policy Wildcard Action or Resource
+id: 9a0d1bfc-4d2f-4f18-9b0a-iam-wildcard
+status: experimental
+description: Flags creation/update of IAM policies with wildcard action or resource
+author: ionkare-security
+logsource:
+  product: aws
+  service: cloudtrail
+detection:
+  selection:
+    eventName: [CreatePolicy, CreatePolicyVersion, PutRolePolicy, PutUserPolicy, PutGroupPolicy]
+    requestParameters: /\"Action\":\s*\"\*\"|\"Resource\":\s*\"\*\"/
+  condition: selection
+level: high

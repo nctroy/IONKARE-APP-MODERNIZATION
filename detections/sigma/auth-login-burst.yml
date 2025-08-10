@@ -1,0 +1,15 @@
+title: Burst Login Failures from Single IP
+id: 6b3f9a6a-0d83-4d4e-9e6e-login-burst
+status: experimental
+description: Multiple failed logins from one IP in a short window
+author: ionkare-security
+logsource:
+  product: application
+  service: auth
+detection:
+  selection:
+    event: login_failed
+  timeframe: 5m
+  condition: selection | count(dst_ip) by dst_ip >= 20
+level: medium
+falsepositives: [Pen tests]

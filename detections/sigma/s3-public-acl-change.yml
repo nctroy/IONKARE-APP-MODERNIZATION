@@ -1,0 +1,14 @@
+title: S3 Public ACL or Policy Change
+id: 2e70f1b7-7de0-4c3d-a5a8-s3-public-change
+status: experimental
+description: Detects S3 bucket becoming public via ACL or policy
+author: ionkare-security
+logsource:
+  product: aws
+  service: cloudtrail
+detection:
+  selection:
+    eventName: [PutBucketAcl, PutBucketPolicy]
+    requestParameters: /.*PublicRead|PublicReadWrite|\"Principal\":\s*\"\*\"/
+  condition: selection
+level: high

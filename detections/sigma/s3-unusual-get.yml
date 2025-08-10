@@ -1,0 +1,13 @@
+title: Unusual S3 GET Volume
+id: 50ecb6f7-b5f2-49ab-a8a0-s3-unusual-get
+status: experimental
+description: High volume S3 GETs from a new principal or location
+author: ionkare-security
+logsource:
+  product: aws
+  service: s3access
+detection:
+  selection:
+    event: GetObject
+  condition: selection
+level: medium
