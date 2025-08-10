@@ -167,3 +167,10 @@ flowchart TD
 ### Security Tooling SLAs and SLOs
 - Defined SLOs for alert delivery, signal to noise, and MTTA or MTTR targets
 - Health checks, runbooks, and quarterly effectiveness reviews
+
+
+## SOC Runbooks
+Runbook templates and workflows are available under `docs/soc-runbooks/`. Integrate steps with your SIEM/SOAR of choice and keep playbooks versioned.
+
+## CIS Benchmark Checklist
+A living checklist is maintained at `docs/cis-benchmark-checklist.md`. We will automate checks via Security Hub/Config and IaC policies.

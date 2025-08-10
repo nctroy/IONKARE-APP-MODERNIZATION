@@ -48,3 +48,31 @@ Make the application AI first after MVP by augmenting patient and supporter expe
 - Which provider and model families will be approved under compliance constraints
 - Scope of PHI in AI features and consent model
 - Retention and deletion SLAs for prompts and embeddings
+
+
+## AI Security
+
+### Threats and Risks
+- Prompt injection and goal hijacking; data exfiltration via tool use
+- Training data poisoning; model supply chain compromise
+- Sensitive data leakage in prompts or outputs; model inversion risks
+- Toxic or unsafe outputs; policy non-compliance
+
+### Controls
+- Provider governance: use vendors with BAA (e.g., Bedrock/Azure) for PHI; isolate workloads per env/tenant
+- Data minimization: redact PII/PHI; allowlist retrieval sources; policy checks pre and post generation
+- Guardrails: schema constrained outputs, content filters, safety classifiers, allow/deny lists
+- Tool/function calling: strict scoping, timeouts, quotas, and audit logs; secrets never exposed to models
+- Network and egress: private endpoints, egress proxy with DLP, model egress controls
+- Observability: full prompt/response logging with redaction; evaluations and abuse feedback
+- Supply chain: verify model/image signatures; track versions/digests; SBOM for models where available
+
+### LLM Strategy (Large and Small Models)
+- Large hosted models for highest quality tasks with privacy and cost controls
+- Small/local models for sensitive or offline tasks; quantized variants for efficiency
+- Abstraction layer to switch providers/models; policy driven routing and fallback
+
+### Integrations
+- RAG gateway with pgvector and policy filtered retrieval
+- Moderation and PII detection pre/post; human-in-the-loop for sensitive flows
+- Evaluation gates in CI for prompts and tasks; red teaming before release
